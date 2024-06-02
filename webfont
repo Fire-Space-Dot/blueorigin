@@ -1,0 +1,190 @@
+### Directory Structure
+```
+auto_batch_run/
+├── batch_jobs/
+│   └── example_job.py
+├── config/
+│   └── batch_jobs.yaml
+├── css/
+│   └── styles.css
+├── fonts/
+│   └── OpenSans-Regular.ttf
+├── templates/
+│   └── index.html
+├── main.py
+├── requirements.txt
+└── README.md
+```
+
+### `css/styles.css`
+```css
+@font-face {
+    font-family: 'OpenSans';
+    src: url('../fonts/OpenSans-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body {
+    font-family: 'OpenSans', sans-serif;
+    background-color: #f4f4f9;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-direction: column;
+}
+
+h1 {
+    font-family: 'OpenSans', sans-serif;
+    font-size: 2em;
+    margin-bottom: 20px;
+}
+
+p {
+    font-family: 'OpenSans', sans-serif;
+    font-size: 1.2em;
+}
+```
+
+### `templates/index.html`
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto Batch Run Dashboard</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <h1>Auto Batch Run Dashboard</h1>
+    <p>This is a demo page for the Auto Batch Run feature.</p>
+</body>
+</html>
+```
+
+### `main.py`
+```python
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.jobstores.yaml import YAMLJobStore
+from flask import Flask, render_template
+import logging
+import time
+
+app = Flask(__name__)
+
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+def start_scheduler():
+    scheduler = BackgroundScheduler()
+    job_store = YAMLJobStore('config/batch_jobs.yaml')
+    scheduler.add_jobstore(job_store)
+    scheduler.start()
+    logging.info("Scheduler started with the following jobs:")
+    for job in scheduler.get_jobs():
+        logging.info(job)
+    try:
+        while True:
+            time.sleep(2)
+    except (KeyboardInterrupt, SystemExit):
+        scheduler.shutdown()
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+if __name__ == "__main__":
+    start_scheduler()
+    app.run(debug=True)
+```
+
+### `requirements.txt`
+```
+APScheduler==3.8.1
+Flask==2.0.2
+PyYAML==5.4.1
+```
+
+### `README.md`
+```markdown
+# Auto Batch Run Demo
+
+This repository demonstrates a simple Auto Batch Run feature using Python, APScheduler, and Flask. It includes a front-end dashboard that uses a webfont for styling.
+
+## Overview
+
+The project sets up scheduled tasks to run automatically based on configurations specified in a YAML file. It also includes a basic web dashboard to display information using the OpenSans webfont.
+
+## Getting Started
+
+### Prerequisites
+
+- Python 3.6+
+- pip (Python package installer)
+
+### Installation
+
+1. Clone the repository:
+
+```sh
+git clone https://github.com/yourusername/auto_batch_run.git
+cd auto_batch_run
+```
+
+2. Install the required Python packages:
+
+```sh
+pip install -r requirements.txt
+```
+
+### Configuration
+
+Batch jobs are defined in the `config/batch_jobs.yaml` file. The example configuration provided runs a job every 10 seconds.
+
+### Running the Scheduler and Web Server
+
+To start the scheduler and the web server, run the `main.py` script:
+
+```sh
+python main.py
+```
+
+### Webfont Integration
+
+The OpenSans webfont is included in the `fonts` directory and is used in the `css/styles.css` file. The `index.html` file in the `templates` directory demonstrates how the font is applied to the page content.
+
+### Adding Your Own Font
+
+1. Place your font file (e.g., `your-font.ttf`) in the `fonts` directory.
+2. Update the `@font-face` rule in `css/styles.css` to reference your new font:
+
+```css
+@font-face {
+    font-family: 'YourFont';
+    src: url('../fonts/your-font.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body {
+    font-family: 'YourFont', sans-serif;
+}
+```
+
+3. Modify the HTML and CSS as needed to apply your font to different elements.
+
+## Contributing
+
+Feel free to open issues or submit pull requests if you have suggestions or improvements.
+
+## License
+
+This project is licensed under the MIT License.
+```
+
+This example integrates a webfont into a Flask-based project that uses APScheduler for auto batch runs. It includes all necessary files and instructions to set up and run the project, demonstrating both backend functionality and frontend styling. Adjust the details as needed to fit your specific requirements!
